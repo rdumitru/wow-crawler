@@ -9,7 +9,7 @@ using WoW.Crawler.Model.Enum;
 
 namespace WoW.Crawler.Model.DTO
 {
-    public class CharacterDto : DtoBase
+    public class CharacterDto
     {
         #region Blizzard Fields
 
@@ -28,7 +28,11 @@ namespace WoW.Crawler.Model.DTO
 
         public int Level { get; set; }
 
-        public SimpleGuildInfo Guild { get; set; }
+        public int TotalHonorableKills { get; set; }
+
+        public GuildSimpleDto Guild { get; set; }
+
+        public IEnumerable<TalentSpecDto> Talents { get; set; }
 
         #endregion Blizzard Fields
 

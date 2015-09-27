@@ -44,22 +44,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Auction.cs" />
-    <Compile Include="CharacterWithSpec.cs" />
+    <Compile Include="DTO\AuctionDto.cs" />
+    <Compile Include="DTO\GlyphDto.cs" />
+    <Compile Include="DTO\GlyphListDto.cs" />
+    <Compile Include="DTO\GuildMemberCharacterDto.cs" />
     <Compile Include="DTO\GuildMemberListDto.cs" />
     <Compile Include="DTO\RealmListDto.cs" />
     <Compile Include="DTO\AuctionListDto.cs" />
     <Compile Include="DTO\AuctionDataStatusDto.cs" />
-    <Compile Include="DTO\DtoBase.cs" />
+    <Compile Include="DTO\SpellDto.cs" />
+    <Compile Include="DTO\TalentDto.cs" />
+    <Compile Include="DTO\TalentSpecDto.cs" />
     <Compile Include="Enum\EnumHelper.cs" />
     <Compile Include="Enum\Enums.cs" />
-    <Compile Include="GuildMember.cs" />
-    <Compile Include="SimpleGuildInfo.cs" />
+    <Compile Include="DTO\GuildMemberDto.cs" />
+    <Compile Include="DTO\GuildSimpleDto.cs" />
     <Compile Include="DTO\CharacterDto.cs" />
-    <Compile Include="Realm.cs" />
-    <Compile Include="JsonFile.cs" />
+    <Compile Include="DTO\RealmDto.cs" />
+    <Compile Include="DTO\JsonFileDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Spec.cs" />
+    <Compile Include="DTO\SpecDto.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

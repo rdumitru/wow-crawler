@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Crawler.Model
+namespace WoW.Crawler.Model.DTO
 {
-    public class JsonFile
+    public class JsonFileDto
     {
         public string Url { get; set; }
 

@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace WoW.Crawler.Model.DTO
 {
-    public abstract class DtoBase
+    public class GuildMemberDto
     {
+        public GuildMemberCharacterDto Character { get; set; }
+
+        public int Rank { get; set; }
     }
 }

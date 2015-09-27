@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Crawler.Model
+namespace WoW.Crawler.Model.DTO
 {
-    public class SimpleGuildInfo
+    public class GuildSimpleDto
     {
         public string Name { get; set; }
 

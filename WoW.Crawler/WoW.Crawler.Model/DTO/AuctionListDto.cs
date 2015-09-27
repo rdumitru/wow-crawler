@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace WoW.Crawler.Model.DTO
 {
-    public class AuctionListDto : DtoBase
+    public class AuctionListDto
     {
-        public IEnumerable<Auction> Auctions { get; set; }
+        public IEnumerable<AuctionDto> Auctions { get; set; }
     }
 }

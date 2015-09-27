@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Crawler.Model.Enum;
 
-namespace WoW.Crawler.Model
+namespace WoW.Crawler.Model.DTO
 {
-    public class CharacterWithSpec
+    public class GuildMemberCharacterDto
     {
         #region Blizzard Fields
 
@@ -27,7 +27,7 @@ namespace WoW.Crawler.Model
 
         public int AchievementPoints { get; set; }
 
-        public Spec Spec { get; set; }
+        public SpecDto Spec { get; set; }
 
         [JsonProperty("Guild")]
         public string GuildName { get; set; }

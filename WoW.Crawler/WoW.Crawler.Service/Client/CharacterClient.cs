@@ -27,9 +27,7 @@ namespace WoW.Crawler.Service.Client
         {
             // Build relative URL.
             NameValueCollection nvc = new NameValueCollection();
-            nvc.Add("fields", "guild");
-
-            // TODO: add talents.
+            nvc.Add("fields", "guild, talents");
 
             var relativeUrl = this.BuildRelativeUrlWithQueryStr(
                 String.Format("wow/character/{0}/{1}", Uri.EscapeDataString(realm), Uri.EscapeDataString(character)), nvc);

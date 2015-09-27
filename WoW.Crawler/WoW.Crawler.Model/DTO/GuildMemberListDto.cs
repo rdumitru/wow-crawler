@@ -19,6 +19,6 @@ namespace WoW.Crawler.Model.DTO
 
         public Faction Side { get; set; }
 
-        public IEnumerable<GuildMember> Members { get; set; }
+        public IEnumerable<GuildMemberDto> Members { get; set; }
     }
 }

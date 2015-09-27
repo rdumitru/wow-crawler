@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace WoW.Crawler.Model.DTO
 {
-    public class RealmListDto
+    public class TalentDto
     {
-        public IEnumerable<RealmDto> Realms { get; set; }
+        public int Tier { get; set; }
+
+        public int Column { get; set; }
+
+        public SpellDto Spell { get; set; }
     }
 }

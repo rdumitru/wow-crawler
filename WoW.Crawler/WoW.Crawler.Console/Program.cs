@@ -30,8 +30,11 @@ namespace WoW.Crawler.Console
 
         public static async Task Test()
         {
-            var client = container.Resolve<ICharacterClient>();
-            var character = await client.GetCharacter("Dipi", "Korgath", Region.US);
+            var realmClient = container.Resolve<IRealmClient>();
+            var realmList = await realmClient.GetRealmList(Region.EU);
+
+            var charClient = container.Resolve<ICharacterClient>();
+            var character = await charClient.GetCharacter("Dipi", "Korgath", Region.US);
 
             var guildClient = container.Resolve<IGuildClient>();
             var guild = await guildClient.GetMemberList("ii kagen ni shiro", "Korgath", Region.US);
