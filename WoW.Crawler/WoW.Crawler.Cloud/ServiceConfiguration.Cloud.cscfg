@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="WoW.Crawler.Cloud" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
+  <Role name="WoW.Crawler.Web">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.ServiceBus.ConnectionString" value="Endpoint=sb://wow-crawler.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=CFmT9sA6f89+Rt7tj6Ig1gxDpMlSqCPi6Po1/e2KG3U=" />
+      <Setting name="BattleNetApi.Key" value="tjgfuqqw6b4uhr2zga97tfn4c5mw3tc7" />
+    </ConfigurationSettings>
+  </Role>
+  <Role name="WoW.Crawler.Realm.Worker">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.ServiceBus.ConnectionString" value="Endpoint=sb://wow-crawler.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=CFmT9sA6f89+Rt7tj6Ig1gxDpMlSqCPi6Po1/e2KG3U=" />
+      <Setting name="BattleNetApi.Key" value="tjgfuqqw6b4uhr2zga97tfn4c5mw3tc7" />
+    </ConfigurationSettings>
+  </Role>
+  <Role name="WoW.Crawler.Guild.Worker">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.ServiceBus.ConnectionString" value="Endpoint=sb://wow-crawler.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=CFmT9sA6f89+Rt7tj6Ig1gxDpMlSqCPi6Po1/e2KG3U=" />
+      <Setting name="BattleNetApi.Key" value="tjgfuqqw6b4uhr2zga97tfn4c5mw3tc7" />
+    </ConfigurationSettings>
+  </Role>
+</ServiceConfiguration>

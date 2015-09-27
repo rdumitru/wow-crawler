@@ -4,8 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Crawler.Model.DTO;
+using WoW.Crawler.Model.Message;
 using WoW.Crawler.Service.Client;
 using WoW.Crawler.Service.Client.Contract;
+using WoW.Crawler.Service.Messaging;
+using WoW.Crawler.Service.Service;
+using WoW.Crawler.Service.Service.Contract;
 
 namespace WoW.Crawler.Service
 {
@@ -39,6 +44,36 @@ namespace WoW.Crawler.Service
             builder
                 .RegisterType<RealmClient>()
                 .As<IRealmClient>()
+                .InstancePerLifetimeScope();
+
+            //=================================================================
+            // SERVICES
+            //=================================================================
+
+            // IAuctionClient.
+            builder
+                .RegisterType<GuildService>()
+                .As<IGuildService>()
+                .InstancePerLifetimeScope();
+
+            // IRealmService.
+            builder
+                .RegisterType<RealmService>()
+                .As<IRealmService>()
+                .InstancePerLifetimeScope();
+
+            // IQueueClientWrapper<RealmDto>
+            builder
+                .RegisterType<QueueClientWrapper<RealmDto>>()
+                .WithParameter("queueName", "WoW.Crawler.RealmQueue")
+                .As<IQueueClientWrapper<RealmDto>>()
+                .InstancePerLifetimeScope();
+
+            // IQueueClientWrapper<ProcessRealmGuildsRequest>
+            builder
+                .RegisterType<QueueClientWrapper<ProcessRealmGuildsRequest>>()
+                .WithParameter("queueName", "WoW.Crawler.Guilds")
+                .As<IQueueClientWrapper<RealmDto>>()
                 .InstancePerLifetimeScope();
         }
     }

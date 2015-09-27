@@ -61,7 +61,7 @@ namespace WoW.Crawler.Service.Client
 
         #region Protected Helpers
 
-        protected HttpClient GetClient(Region region = Region.EU)
+        protected HttpClient GetClient(Region region)
         {
             switch (region)
             {

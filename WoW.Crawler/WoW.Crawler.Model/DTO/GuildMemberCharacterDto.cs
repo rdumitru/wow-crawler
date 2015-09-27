@@ -40,6 +40,8 @@ namespace WoW.Crawler.Model.DTO
 
         public Faction Faction { get; set; }
 
+        public Region Region { get; set; }
+
         #endregion Post-Processing Fields
 
         #region Helpers

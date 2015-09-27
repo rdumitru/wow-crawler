@@ -11,6 +11,7 @@ using WoW.Crawler.Model.Enum;
 using WoW.Crawler.Service;
 using WoW.Crawler.Service.Client;
 using WoW.Crawler.Service.Client.Contract;
+using WoW.Crawler.Service.Service.Contract;
 
 namespace WoW.Crawler.Console
 {
@@ -30,14 +31,17 @@ namespace WoW.Crawler.Console
 
         public static async Task Test()
         {
-            var realmClient = container.Resolve<IRealmClient>();
-            var realmList = await realmClient.GetRealmList(Region.EU);
+            //var realmClient = container.Resolve<IRealmClient>();
+            //var realmList = await realmClient.GetRealmList(Region.EU);
 
-            var charClient = container.Resolve<ICharacterClient>();
-            var character = await charClient.GetCharacter("Dipi", "Korgath", Region.US);
+            //var charClient = container.Resolve<ICharacterClient>();
+            //var character = await charClient.GetCharacter("Dipi", "Korgath", Region.US);
 
-            var guildClient = container.Resolve<IGuildClient>();
-            var guild = await guildClient.GetMemberList("ii kagen ni shiro", "Korgath", Region.US);
+            //var guildClient = container.Resolve<IGuildClient>();
+            //var guild = await guildClient.GetMemberList("ii kagen ni shiro", "Korgath", Region.US);
+
+            var guildService = container.Resolve<IGuildService>();
+            await guildService.GetGuildListForRealm("Medivh", Region.EU);
         }
     }
 }

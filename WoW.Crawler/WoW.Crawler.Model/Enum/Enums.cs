@@ -11,11 +11,13 @@ namespace WoW.Crawler.Model.Enum
 
     public enum Region
     {
+        Unknown = 0,
+
         [Description("eu")]
-        EU = 0,
+        EU = 1,
 
         [Description("us")]
-        US = 1
+        US = 2
     }
 
     public enum Faction

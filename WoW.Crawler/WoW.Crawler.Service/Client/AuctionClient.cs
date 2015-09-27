@@ -46,7 +46,15 @@ namespace WoW.Crawler.Service.Client
             var response = await this.GetClient(region).GetAsync(auctionDataStatus.Files.First().Url);
             response.EnsureSuccessStatusCode();
 
+            // Deserialize content.
             var responseContent = await this.DeserializeContentAsync<AuctionListDto>(response.Content);
+
+            // Set post-processing fields.
+            foreach (var auction in responseContent.Auctions)
+            {
+                auction.Region = region;
+            }
+
             return responseContent;
         }
 

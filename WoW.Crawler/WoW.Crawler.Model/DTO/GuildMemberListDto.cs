@@ -10,6 +10,8 @@ namespace WoW.Crawler.Model.DTO
 {
     public class GuildMemberListDto
     {
+        #region Blizzard Fields
+
         public DateTime LastModified { get; set; }
 
         public string Name { get; set; }
@@ -20,5 +22,13 @@ namespace WoW.Crawler.Model.DTO
         public Faction Side { get; set; }
 
         public IEnumerable<GuildMemberDto> Members { get; set; }
+
+        #endregion Blizzard Fields
+
+        #region Post-Processing Fields
+
+        public Region Region { get; set; }
+
+        #endregion Post-Processing Fields
     }
 }

@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Crawler.Model.Enum;
 
 namespace WoW.Crawler.Model.DTO
 {
     public class GuildSimpleDto
     {
+        #region Blizzard Fields
+
         public string Name { get; set; }
 
         [JsonProperty("Realm")]
@@ -16,5 +19,13 @@ namespace WoW.Crawler.Model.DTO
 
         [JsonProperty("Members")]
         public int MemberCount { get; set; }
+
+        #endregion Blizzard Fields
+
+        #region Post-Processing Fields
+
+        public Region Region { get; set; }
+
+        #endregion Post-Processing Fields
     }
 }

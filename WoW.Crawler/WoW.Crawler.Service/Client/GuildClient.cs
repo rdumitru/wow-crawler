@@ -36,11 +36,16 @@ namespace WoW.Crawler.Service.Client
             var response = await this.GetClient(region).GetAsync(relativeUrl);
             response.EnsureSuccessStatusCode();
 
+            // Deserialize content.
             var responseContent = await this.DeserializeContentAsync<GuildMemberListDto>(response.Content);
+
+            // Set post-processing fields.
             foreach (var member in responseContent.Members)
             {
                 member.Character.SetFaction();
+                member.Character.Region = region;
             }
+            responseContent.Region = region;
 
             return responseContent;
         }
