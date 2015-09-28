@@ -65,14 +65,14 @@ namespace WoW.Crawler.Service
             // IQueueClientWrapper<RealmDto>
             builder
                 .RegisterType<QueueClientWrapper<RealmDto>>()
-                .WithParameter("queueName", "WoW.Crawler.RealmQueue")
+                .WithParameter("queueName", "WoW.Crawler.Realms.Queue")
                 .As<IQueueClientWrapper<RealmDto>>()
                 .InstancePerDependency();
 
             // IQueueClientWrapper<ProcessRealmGuildsRequest>
             builder
                 .RegisterType<QueueClientWrapper<ProcessRealmGuildsRequest>>()
-                .WithParameter("queueName", "WoW.Crawler.GuildsQueue")
+                .WithParameter("queueName", "WoW.Crawler.Guilds.Queue")
                 .As<IQueueClientWrapper<ProcessRealmGuildsRequest>>()
                 .InstancePerDependency();
         }
