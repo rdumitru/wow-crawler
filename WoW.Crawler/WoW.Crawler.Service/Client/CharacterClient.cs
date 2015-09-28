@@ -23,12 +23,18 @@ namespace WoW.Crawler.Service.Client
 
         #region Public Members
 
-        public async Task<CharacterDto> GetCharacter(string character, string realm, Region region)
+        public async Task<CharacterDto> GetCharacter(string character, string realm, Region region, 
+            bool includeGuild = false, bool includeTalents = false)
         {
-            // Build relative URL.
-            NameValueCollection nvc = new NameValueCollection();
-            nvc.Add("fields", "guild, talents");
+            // Set values for the "fields" query string field.
+            var fieldsValues = new List<string>();
+            if (includeGuild) fieldsValues.Add("guild");
+            if (includeTalents) fieldsValues.Add("talents");
 
+            NameValueCollection nvc = new NameValueCollection();
+            if (fieldsValues.Count > 0) nvc.Add("fields", String.Join(", ", fieldsValues));
+
+            // Build relative URL.
             var relativeUrl = this.BuildRelativeUrlWithQueryStr(
                 String.Format("wow/character/{0}/{1}", Uri.EscapeDataString(realm), Uri.EscapeDataString(character)), nvc);
 

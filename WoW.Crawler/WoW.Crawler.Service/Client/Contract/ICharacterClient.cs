@@ -10,6 +10,7 @@ namespace WoW.Crawler.Service.Client.Contract
 {
     public interface ICharacterClient
     {
-        Task<CharacterDto> GetCharacter(string character, string realm, Region region);
+        Task<CharacterDto> GetCharacter(string character, string realm, Region region, 
+            bool includeGuild = false, bool includeTalents = false);
     }
 }

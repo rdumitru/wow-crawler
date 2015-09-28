@@ -34,14 +34,14 @@ namespace WoW.Crawler.Console
             //var realmClient = container.Resolve<IRealmClient>();
             //var realmList = await realmClient.GetRealmList(Region.EU);
 
-            //var charClient = container.Resolve<ICharacterClient>();
-            //var character = await charClient.GetCharacter("Dipi", "Korgath", Region.US);
+            var charClient = container.Resolve<ICharacterClient>();
+            var character = await charClient.GetCharacter("Dipi", "Korgath", Region.US, false, false);
 
             //var guildClient = container.Resolve<IGuildClient>();
             //var guild = await guildClient.GetMemberList("ii kagen ni shiro", "Korgath", Region.US);
 
-            var guildService = container.Resolve<IGuildService>();
-            await guildService.GetGuildListForRealm("Medivh", Region.EU);
+            //var guildService = container.Resolve<IGuildService>();
+            //await guildService.GetGuildListForRealm("Medivh", Region.EU);
         }
     }
 }

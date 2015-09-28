@@ -45,7 +45,7 @@ namespace WoW.Crawler.Service.Service
             {
                 try
                 {
-                    var character = await this._characterClient.GetCharacter(auction.Owner, auction.OwnerRealmName, auction.Region);
+                    var character = await this._characterClient.GetCharacter(auction.Owner, auction.OwnerRealmName, auction.Region, true, false);
                     if (character != null && character.Guild != null)
                     {
                         guilds.Add(character.Guild);
