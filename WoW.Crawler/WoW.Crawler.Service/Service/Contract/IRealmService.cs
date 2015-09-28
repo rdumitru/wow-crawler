@@ -11,5 +11,7 @@ namespace WoW.Crawler.Service.Service.Contract
     public interface IRealmService
     {
         Task<RealmListDto> GetRealmList(Region region);
+
+        Task<RealmListDto> GetAllRealms();
     }
 }

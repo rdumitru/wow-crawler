@@ -38,6 +38,15 @@ namespace WoW.Crawler.Service.Service
             return realmList;
         }
 
+        public async Task<RealmListDto> GetAllRealms()
+        {
+            var allRealms = new List<RealmDto>();
+            allRealms.AddRange((await this._realmClient.GetRealmList(Region.EU)).Realms);
+            allRealms.AddRange((await this._realmClient.GetRealmList(Region.US)).Realms);
+
+            return new RealmListDto { Realms = allRealms };
+        }
+
         #endregion Public Members
     }
 }
