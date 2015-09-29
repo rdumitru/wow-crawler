@@ -42,15 +42,17 @@ namespace WoW.Crawler.Realm.Worker
                 var realmGuilds = new ProcessRealmGuildsRequest();
                 realmGuilds.Realm = request;
 
+                // TODO: get all realm guilds here.
+
                 // Test data.
                 realmGuilds.Guilds = new List<GuildSimpleDto>
                 {
                     new GuildSimpleDto
                     {
-                        Name = "Test Guild Name",
-                        MemberCount = 1,
-                        RealmName = request.Name,
-                        Region = request.Region
+                        Name = "ii kagen ni shiro",
+                        MemberCount = 0,
+                        RealmName = "Korgath",
+                        Region = Model.Enum.Region.US
                     }
                 };
 

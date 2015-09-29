@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Azure;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
@@ -49,8 +50,9 @@ namespace WoW.Crawler.Service.Client
             this._jsonSerializerSettings.Converters.Add(new MillisecondsToDateTimeConverter());
             this._jsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 
+            // TODO: perhaps make this a parameter?
             // Get values for the config.
-            this._apiKey = ConfigurationManager.AppSettings["BattleNetApi.Key"];
+            this._apiKey = CloudConfigurationManager.GetSetting("BattleNetApi.Key");
 
             // Create the HTTP client with the given base URL.
             this._clientEU = new HttpClient { BaseAddress = new Uri(BattleNetApiBaseUrlEU) };

@@ -5,12 +5,14 @@ using System.Diagnostics;
 using WoW.Crawler.Model.Message;
 using WoW.Crawler.Service;
 using WoW.Crawler.Service.Messaging;
+using WoW.Crawler.Service.Service.Contract;
 
 namespace WoW.Crawler.Guild.Worker
 {
     public class WorkerRole : RoleEntryPoint
     {
         private IQueueClientWrapper<ProcessRealmGuildsRequest> _guildsQueueClient;
+        private IGuildService _guildService;
 
         public override bool OnStart()
         {
@@ -21,6 +23,7 @@ namespace WoW.Crawler.Guild.Worker
 
             // Assign injections.
             this._guildsQueueClient = container.Resolve<IQueueClientWrapper<ProcessRealmGuildsRequest>>();
+            this._guildService = container.Resolve<IGuildService>();
 
             Trace.TraceInformation("WoW.Crawler.Guild.Worker has been started");
             return base.OnStart();
@@ -29,10 +32,22 @@ namespace WoW.Crawler.Guild.Worker
         public override void Run()
         {
             Trace.WriteLine("WoW.Crawler.Guild.Worker is running");
-            this._guildsQueueClient.ReceiveMessage((jobId, request) =>
+            this._guildsQueueClient.ReceiveMessage(async (jobId, request) =>
             {
                 Trace.WriteLine(String.Format("WoW.Crawler.Guild.Worker consumed message with Id = {0}", jobId));
-                // TODO: do work here.
+
+                foreach (var guild in request.Guilds)
+                {
+                    try
+                    {
+                        var characters = await this._guildService.GetGuildDetailedCharacters(guild.Name, guild.RealmName, guild.Region);
+                        // TODO: do something with the characters.
+                    }
+                    catch (Exception)
+                    {
+                        // Should happen for inexistent guilds.
+                    }
+                }
             });
         }
 

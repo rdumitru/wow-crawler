@@ -30,12 +30,11 @@ namespace WoW.Crawler.Service.Service
 
         #region Public Members
 
-        public async Task<RealmListDto> GetRealmList(Region region)
+        public Task<RealmListDto> GetRealmList(Region region)
         {
             // Get the realm list for the requested region.
-            var realmList = await this._realmClient.GetRealmList(region);
-
-            return realmList;
+            var realmListTask = this._realmClient.GetRealmList(region);
+            return realmListTask;
         }
 
         public async Task<RealmListDto> GetAllRealms()
