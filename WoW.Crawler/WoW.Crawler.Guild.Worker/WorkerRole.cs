@@ -40,7 +40,7 @@ namespace WoW.Crawler.Guild.Worker
                 {
                     try
                     {
-                        var characters = await this._guildService.GetGuildDetailedCharacters(guild.Name, guild.RealmName, guild.Region);
+                        var characters = await this._guildService.GetGuildDetailedCharactersAsync(guild.Name, guild.RealmName, guild.Region);
                         // TODO: do something with the characters.
                     }
                     catch (Exception)

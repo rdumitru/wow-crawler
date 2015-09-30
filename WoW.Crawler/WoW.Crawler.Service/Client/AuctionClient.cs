@@ -22,7 +22,7 @@ namespace WoW.Crawler.Service.Client
 
         #region Public Members
 
-        public async Task<AuctionDataStatusDto> GetAuctionDataStatus(string realm, Region region)
+        public async Task<AuctionDataStatusDto> GetAuctionDataStatusAsync(string realm, Region region)
         {
             // Build relative URL.
             var relativeUrl = this.BuildRelativeUrlWithQueryStr(
@@ -36,10 +36,10 @@ namespace WoW.Crawler.Service.Client
             return responseContent;
         }
 
-        public async Task<AuctionListDto> GetAuctionList(string realm, Region region)
+        public async Task<AuctionListDto> GetAuctionListAsync(string realm, Region region)
         {
             // Get URL information.
-            var auctionDataStatus = await this.GetAuctionDataStatus(realm, region);
+            var auctionDataStatus = await this.GetAuctionDataStatusAsync(realm, region);
             if (auctionDataStatus.Files.Count() <= 0) return new AuctionListDto();
 
             // Make GET request.

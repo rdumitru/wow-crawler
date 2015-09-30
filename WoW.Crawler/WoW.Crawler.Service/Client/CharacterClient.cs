@@ -23,7 +23,7 @@ namespace WoW.Crawler.Service.Client
 
         #region Public Members
 
-        public async Task<CharacterDto> GetCharacter(string character, string realm, Region region,
+        public async Task<CharacterDto> GetCharacterAsync(string character, string realm, Region region,
             bool includeGuild = false, bool includeTalents = false)
         {
             // Set values for the "fields" query string field.

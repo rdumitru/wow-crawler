@@ -10,10 +10,10 @@ namespace WoW.Crawler.Service.Service.Contract
 {
     public interface IGuildService
     {
-        Task<IEnumerable<GuildSimpleDto>> GetGuildsForRealm(string realm, Region region);
+        Task<IEnumerable<GuildSimpleDto>> GetGuildsForRealmAsync(string realm, Region region);
 
-        Task<GuildMemberListDto> GetGuildMemberList(string guild, string realm, Region region);
+        Task<GuildMemberListDto> GetGuildMemberListAsync(string guild, string realm, Region region);
 
-        Task<IEnumerable<CharacterDto>> GetGuildDetailedCharacters(string guild, string realm, Region region);
+        Task<IEnumerable<CharacterDto>> GetGuildDetailedCharactersAsync(string guild, string realm, Region region);
     }
 }

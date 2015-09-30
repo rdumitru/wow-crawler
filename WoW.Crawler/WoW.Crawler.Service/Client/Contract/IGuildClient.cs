@@ -10,6 +10,6 @@ namespace WoW.Crawler.Service.Client.Contract
 {
     public interface IGuildClient
     {
-        Task<GuildMemberListDto> GetMemberList(string guild, string realm, Region region);
+        Task<GuildMemberListDto> GetMemberListAsync(string guild, string realm, Region region);
     }
 }

@@ -44,7 +44,7 @@ namespace WoW.Crawler.Web.Controllers
         [HttpPost, Route("")]
         public async Task<HttpResponseMessage> Trigger()
         {
-            var allRealms = (await this._realmService.GetAllRealms()).Realms;
+            var allRealms = (await this._realmService.GetAllRealmsAsync()).Realms;
             foreach (var realm in allRealms)
             {
                 var id = Guid.NewGuid();

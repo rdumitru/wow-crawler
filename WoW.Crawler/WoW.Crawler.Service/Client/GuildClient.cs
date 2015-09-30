@@ -23,7 +23,7 @@ namespace WoW.Crawler.Service.Client
 
         #region Public Members
 
-        public async Task<GuildMemberListDto> GetMemberList(string guild, string realm, Region region)
+        public async Task<GuildMemberListDto> GetMemberListAsync(string guild, string realm, Region region)
         {
             // Build relative URL.
             NameValueCollection nvc = new NameValueCollection();

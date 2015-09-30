@@ -34,72 +34,59 @@ namespace WoW.Crawler.Service.Service
 
         #region Public Members
 
-        public async Task<IEnumerable<GuildSimpleDto>> GetGuildsForRealm(string realm, Region region)
+        public async Task<IEnumerable<GuildSimpleDto>> GetGuildsForRealmAsync(string realm, Region region)
         {
-            // Keep only one instance of each guild.
-            var guilds = new HashSet<GuildSimpleDto>();
-
             // Get the list of all auctions on the server.
-            var auctionList = await this._auctionClient.GetAuctionList(realm, region);
+            var auctionList = await this._auctionClient.GetAuctionListAsync(realm, region);
 
-            // Get the guild from each auction owner.
-            var idx = 0;
-            var total = auctionList.Auctions.Count();
-
-            // TODO: finish this.
-            //var characterTasks = auctionList.Auctions.Select(auction => this._characterClient.GetCharacter(auction.Owner, auction.OwnerRealmName, auction.Region, true, false)).Take(5);
-            //var characters = await Task.WhenAll(characterTasks);
-
-            foreach (var auction in auctionList.Auctions)
+            // Return null for tasks which throw an exception.
+            Func<Task<CharacterDto>, Task<CharacterDto>> taskWrapper = async (task) =>
             {
-                try
-                {
-                    var character = await this._characterClient.GetCharacter(auction.Owner, auction.OwnerRealmName, auction.Region, true, false);
-                    if (character != null && character.Guild != null)
-                    {
-                        guilds.Add(character.Guild);
-                    }
-                }
-                catch (HttpRequestException)
-                {
-                    // This will happen for inactive players.
-                }
+                try { return await task; }
+                catch (HttpRequestException) { return null; }
+            };
 
-                Console.WriteLine("{0} / {1}", idx, total);
-                idx++;
-            }
+            // Create a task for each character request.
+            // TODO: remove the Take.
+            var characterTasks = auctionList.Auctions.Select(auction => this._characterClient.GetCharacterAsync(auction.Owner, auction.OwnerRealmName, auction.Region, true, false))
+                .Take(50);
+            var wrappedCharacterTasks = characterTasks.Select(task => taskWrapper(task));
+
+            var unfilteredGuilds = (await Task.WhenAll(wrappedCharacterTasks))
+                .Where(character => character != null && character.Guild != null)
+                .Select(character => character.Guild)
+                .ToList();
+
+            // Remove duplicate guilds.
+            var guilds = new HashSet<GuildSimpleDto>(unfilteredGuilds);
 
             return guilds;
         }
 
-        public Task<GuildMemberListDto> GetGuildMemberList(string guild, string realm, Region region)
+        public Task<GuildMemberListDto> GetGuildMemberListAsync(string guild, string realm, Region region)
         {
-            return this._guildClient.GetMemberList(guild, realm, region);
+            return this._guildClient.GetMemberListAsync(guild, realm, region);
         }
 
-        public async Task<IEnumerable<CharacterDto>> GetGuildDetailedCharacters(string guild, string realm, Region region)
+        public async Task<IEnumerable<CharacterDto>> GetGuildDetailedCharactersAsync(string guild, string realm, Region region)
         {
-            // The list of all the characters in this guild.
-            var characters = new List<CharacterDto>();
-
             // Get the simple list of members.
-            var memberList = await this._guildClient.GetMemberList(guild, realm, region);
+            var memberList = await this._guildClient.GetMemberListAsync(guild, realm, region);
 
-            foreach (var member in memberList.Members)
+            // Return null for tasks which throw an exception.
+            Func<Task<CharacterDto>, Task<CharacterDto>> taskWrapper = async (task) =>
             {
-                // WARN: This should never happen!
-                if (member.Character.Region != region) throw new ApplicationException();
+                try { return await task; }
+                catch (HttpRequestException) { return null; }
+            };
 
-                try
-                {
-                    var character = await this._characterClient.GetCharacter(member.Character.Name, member.Character.RealmName, member.Character.Region, true, true);
-                    if (character != null) characters.Add(character);
-                }
-                catch (HttpRequestException)
-                {
-                    // This will happen for inactive players.
-                }
-            }
+            // Create a task for each character request.
+            var characterTasks = memberList.Members.Select(member => this._characterClient.GetCharacterAsync(member.Character.Name, member.Character.RealmName, member.Character.Region, true, true));
+            var wrappedCharacterTasks = characterTasks.Select(task => taskWrapper(task));
+
+            var characters = (await Task.WhenAll(wrappedCharacterTasks))
+                .Where(character => character != null)
+                .ToList();
 
             return characters;
         }

@@ -10,8 +10,8 @@ namespace WoW.Crawler.Service.Client.Contract
 {
     public interface IAuctionClient
     {
-        Task<AuctionDataStatusDto> GetAuctionDataStatus(string realm, Region region);
+        Task<AuctionDataStatusDto> GetAuctionDataStatusAsync(string realm, Region region);
 
-        Task<AuctionListDto> GetAuctionList(string realm, Region region);
+        Task<AuctionListDto> GetAuctionListAsync(string realm, Region region);
     }
 }

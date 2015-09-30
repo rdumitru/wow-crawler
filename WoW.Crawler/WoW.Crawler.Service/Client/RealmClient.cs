@@ -21,7 +21,7 @@ namespace WoW.Crawler.Service.Client
 
         #region Public Members
 
-        public async Task<RealmListDto> GetRealmList(Region region)
+        public async Task<RealmListDto> GetRealmListAsync(Region region)
         {
             // Build relative URL.
             var relativeUrl = this.BuildRelativeUrlWithQueryStr("wow/realm/status");

@@ -10,6 +10,6 @@ namespace WoW.Crawler.Service.Client.Contract
 {
     public interface IRealmClient
     {
-        Task<RealmListDto> GetRealmList(Region region);
+        Task<RealmListDto> GetRealmListAsync(Region region);
     }
 }
