@@ -24,11 +24,10 @@ namespace WoW.Crawler.Service.Client
         public async Task<RealmListDto> GetRealmListAsync(Region region)
         {
             // Build relative URL.
-            var relativeUrl = this.BuildRelativeUrlWithQueryStr("wow/realm/status");
+            var relativeUrl = "wow/realm/status";
 
             // Make GET request.
-            var response = await this.GetClient(region).GetAsync(relativeUrl);
-            response.EnsureSuccessStatusCode();
+            var response = await this.GetAsync(region, relativeUrl);
 
             // Add the appropriate region to each realm.
             var responseContent = await this.DeserializeContentAsync<RealmListDto>(response.Content);

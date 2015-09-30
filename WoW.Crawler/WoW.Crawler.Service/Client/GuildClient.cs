@@ -29,12 +29,10 @@ namespace WoW.Crawler.Service.Client
             NameValueCollection nvc = new NameValueCollection();
             nvc.Add("fields", "members");
 
-            var relativeUrl = this.BuildRelativeUrlWithQueryStr(
-                String.Format("wow/guild/{0}/{1}", Uri.EscapeDataString(realm), Uri.EscapeDataString(guild)), nvc);
+            var relativeUrl = String.Format("wow/guild/{0}/{1}", Uri.EscapeDataString(realm), Uri.EscapeDataString(guild));
 
             // Make GET request.
-            var response = await this.GetClient(region).GetAsync(relativeUrl);
-            response.EnsureSuccessStatusCode();
+            var response = await this.GetAsync(region, relativeUrl, nvc);
 
             // Deserialize content.
             var responseContent = await this.DeserializeContentAsync<GuildMemberListDto>(response.Content);

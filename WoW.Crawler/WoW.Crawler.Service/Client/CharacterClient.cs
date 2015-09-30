@@ -35,12 +35,10 @@ namespace WoW.Crawler.Service.Client
             if (fieldsValues.Count > 0) nvc.Add("fields", String.Join(", ", fieldsValues));
 
             // Build relative URL.
-            var relativeUrl = this.BuildRelativeUrlWithQueryStr(
-                String.Format("wow/character/{0}/{1}", Uri.EscapeDataString(realm), Uri.EscapeDataString(character)), nvc);
+            var relativeUrl = String.Format("wow/character/{0}/{1}", Uri.EscapeDataString(realm), Uri.EscapeDataString(character));
 
             // Make GET request.
-            var response = await this.GetClient(region).GetAsync(relativeUrl);
-            response.EnsureSuccessStatusCode();
+            var response = await this.GetAsync(region, relativeUrl, nvc);
 
             // Deserialize content.
             var responseContent = await this.DeserializeContentAsync<CharacterDto>(response.Content);

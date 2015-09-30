@@ -19,8 +19,8 @@ namespace WoW.Crawler.Service.Client
     {
         #region Private Fields
 
-        private readonly string _apiKey;
         private readonly string _locale;
+        private readonly IEnumerable<string> _apiKeys;
         private readonly JsonSerializerSettings _jsonSerializerSettings;
 
         #endregion Private Fields
@@ -51,8 +51,8 @@ namespace WoW.Crawler.Service.Client
             this._jsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 
             // TODO: perhaps make this a parameter?
-            // Get values for the config.
-            this._apiKey = CloudConfigurationManager.GetSetting("BattleNetApi.Key");
+            // Get values from the config.
+            this._apiKeys = CloudConfigurationManager.GetSetting("BattleNetApi.Keys").Split('|');
 
             // Create the HTTP client with the given base URL.
             this._clientEU = new HttpClient { BaseAddress = new Uri(BattleNetApiBaseUrlEU) };
@@ -78,11 +78,13 @@ namespace WoW.Crawler.Service.Client
             }
         }
 
-        protected string BuildQueryStr(NameValueCollection keyValuePairs = null)
+        protected string BuildQueryStr(string apiKey, NameValueCollection keyValuePairs = null)
         {
-            // Locale and API key.
+            // Avoid a null reference.
             keyValuePairs = keyValuePairs ?? new NameValueCollection();
-            var baseQueryStr = String.Format("?locale={0}&apikey={1}", Uri.EscapeDataString(Locale), Uri.EscapeDataString(this._apiKey));
+
+            // Locale and API key.
+            var baseQueryStr = String.Format("?locale={0}&apikey={1}", Uri.EscapeDataString(Locale), Uri.EscapeDataString(apiKey));
 
             // Optional query string fields.
             var nvc = HttpUtility.ParseQueryString(String.Empty);
@@ -96,12 +98,22 @@ namespace WoW.Crawler.Service.Client
             return fullQueryStr;
         }
 
-        protected string BuildRelativeUrlWithQueryStr(string relativeUrl, NameValueCollection keyValuePairs = null)
+        protected async Task<HttpResponseMessage> GetAsync(Region region, string relativeUrl, NameValueCollection queryStrNvc = null)
         {
-            // Everything should be URL encoded.
-            var relativeUrlWithQueryStr = relativeUrl + this.BuildQueryStr(keyValuePairs);
+            HttpResponseMessage lastResponse = null;
+            foreach (var apiKey in this._apiKeys)
+            {
+                // Build URL.
+                var url = relativeUrl + this.BuildQueryStr(apiKey, queryStrNvc);
 
-            return relativeUrlWithQueryStr;
+                // Make call.
+                var response = await this.GetClient(region).GetAsync(url);
+                if (response.IsSuccessStatusCode) return response;
+                lastResponse = response;
+            }
+
+            lastResponse.EnsureSuccessStatusCode();
+            return lastResponse; // WARN: Should never reach here.
         }
 
         protected Task<StringContent> SerializeContentAsync<T>(T obj)

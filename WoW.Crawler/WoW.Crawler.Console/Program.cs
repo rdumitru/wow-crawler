@@ -34,8 +34,8 @@ namespace WoW.Crawler.Console
             //var realmClient = container.Resolve<IRealmClient>();
             //var realmList = await realmClient.GetRealmList(Region.EU);
 
-            // var charClient = container.Resolve<ICharacterClient>();
-            // var character = await charClient.GetCharacter("Dipi", "Korgath", Region.US, false, false);
+            //var charClient = container.Resolve<ICharacterClient>();
+            //var character = await charClient.GetCharacterAsync("Dipi", "Korgath", Region.US, false, false);
 
             //var guildClient = container.Resolve<IGuildClient>();
             //var guild = await guildClient.GetMemberList("ii kagen ni shiro", "Korgath", Region.US);
@@ -43,10 +43,12 @@ namespace WoW.Crawler.Console
             //var guildService = container.Resolve<IGuildService>();
             //var guilds = await guildService.GetGuildsForRealm("Medivh", Region.EU);
 
-
             var guildService = container.Resolve<IGuildService>();
             var guildMembers = await guildService.GetGuildDetailedCharactersAsync("Reroll Horde", "Medivh", Region.EU);
             var guildMembers2 = await guildService.GetGuildMemberListAsync("Reroll Horde", "Medivh", Region.EU);
+
+            //var auctionClient = container.Resolve<IAuctionClient>();
+            //var auctions = await auctionClient.GetAuctionListAsync("Medivh", Region.EU);
         }
     }
 }

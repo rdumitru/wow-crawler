@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -25,12 +26,10 @@ namespace WoW.Crawler.Service.Client
         public async Task<AuctionDataStatusDto> GetAuctionDataStatusAsync(string realm, Region region)
         {
             // Build relative URL.
-            var relativeUrl = this.BuildRelativeUrlWithQueryStr(
-                String.Format("wow/auction/data/{0}", Uri.EscapeDataString(realm)));
+            var relativeUrl = String.Format("wow/auction/data/{0}", Uri.EscapeDataString(realm));
 
             // Make GET request.
-            var response = await this.GetClient(region).GetAsync(relativeUrl);
-            response.EnsureSuccessStatusCode();
+            var response = await this.GetAsync(region, relativeUrl);
 
             var responseContent = await this.DeserializeContentAsync<AuctionDataStatusDto>(response.Content);
             return responseContent;
@@ -43,7 +42,7 @@ namespace WoW.Crawler.Service.Client
             if (auctionDataStatus.Files.Count() <= 0) return new AuctionListDto();
 
             // Make GET request.
-            var response = await this.GetClient(region).GetAsync(auctionDataStatus.Files.First().Url);
+            var response = await (new HttpClient()).GetAsync(auctionDataStatus.Files.First().Url);
             response.EnsureSuccessStatusCode();
 
             // Deserialize content.
