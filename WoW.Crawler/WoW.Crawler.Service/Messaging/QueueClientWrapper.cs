@@ -4,6 +4,7 @@ using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -16,7 +17,11 @@ namespace WoW.Crawler.Service.Messaging
     {
         Task SendMessageAsync(Guid messageId, string body);
 
-        void ReceiveMessage(Action<Guid, T> action);
+        void ReceiveMessage(Action<Guid, T> action, TimeSpan autoRenewTimeout,
+            int maxConcurrentCalls = 1, bool autoComplete = true);
+
+        void ReceiveMessageAsync(Func<Guid, T, Task> func, TimeSpan autoRenewTimeout,
+            int maxConcurrentCalls = 1, bool autoComplete = true);
 
         void CloseConnection();
     }
@@ -49,19 +54,62 @@ namespace WoW.Crawler.Service.Messaging
             await this._client.SendAsync(new BrokeredMessage(body) { MessageId = messageId.ToString() });
         }
 
-        public void ReceiveMessage(Action<Guid, T> action)
+        public void ReceiveMessage(Action<Guid, T> action, TimeSpan autoRenewTimeout,
+            int maxConcurrentCalls = 1, bool autoComplete = true)
         {
-            // Initiates the message pump and callback is invoked for each message that is received, calling close on the client will stop the pump.
-            this._client.OnMessage(receivedMessage =>
+            try
             {
-                var jobId = Guid.Parse(receivedMessage.MessageId);
-                var messageBody = receivedMessage.GetBody<string>();
-                var request = JsonConvert.DeserializeObject<T>(messageBody);
+                // Initiates the message pump and callback is invoked for each message that is received, calling close on the client will stop the pump.
+                this._client.OnMessage(msg =>
+                {
+                    var jobId = Guid.Parse(msg.MessageId);
+                    var messageBody = msg.GetBody<string>();
+                    var request = JsonConvert.DeserializeObject<T>(messageBody);
 
-                action(jobId, request);
-            });
+                    action(jobId, request);
+                },
+                new OnMessageOptions
+                {
+                    AutoComplete = autoComplete,
+                    AutoRenewTimeout = autoRenewTimeout,
+                    MaxConcurrentCalls = maxConcurrentCalls
+                });
 
-            this._completedEvent.WaitOne();
+                this._completedEvent.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message);
+            }
+        }
+
+        public void ReceiveMessageAsync(Func<Guid, T, Task> func, TimeSpan autoRenewTimeout,
+            int maxConcurrentCalls = 1, bool autoComplete = true)
+        {
+            try
+            {
+                // Initiates the message pump and callback is invoked for each message that is received, calling close on the client will stop the pump.
+                this._client.OnMessageAsync(async msg =>
+                {
+                    var jobId = Guid.Parse(msg.MessageId);
+                    var messageBody = msg.GetBody<string>();
+                    var request = JsonConvert.DeserializeObject<T>(messageBody);
+
+                    await func(jobId, request);
+                },
+                new OnMessageOptions
+                {
+                    AutoComplete = autoComplete,
+                    AutoRenewTimeout = autoRenewTimeout,
+                    MaxConcurrentCalls = maxConcurrentCalls
+                });
+
+                this._completedEvent.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message);
+            }
         }
 
         public void CloseConnection()

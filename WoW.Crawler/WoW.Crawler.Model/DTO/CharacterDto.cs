@@ -75,7 +75,8 @@ namespace WoW.Crawler.Model.DTO
                     return;
 
                 default:
-                    throw new ArgumentException();
+                    this.Faction = Faction.Unknown;
+                    return;
             }
         }
 

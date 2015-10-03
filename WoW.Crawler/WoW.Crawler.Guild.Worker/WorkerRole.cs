@@ -2,6 +2,8 @@
 using Microsoft.WindowsAzure.ServiceRuntime;
 using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
 using WoW.Crawler.Model.Message;
 using WoW.Crawler.Service;
 using WoW.Crawler.Service.Messaging;
@@ -32,23 +34,33 @@ namespace WoW.Crawler.Guild.Worker
         public override void Run()
         {
             Trace.WriteLine("WoW.Crawler.Guild.Worker is running");
-            this._guildsQueueClient.ReceiveMessage(async (jobId, request) =>
+            this._guildsQueueClient.ReceiveMessageAsync(async (jobId, request) =>
             {
-                Trace.WriteLine(String.Format("WoW.Crawler.Guild.Worker consumed message with Id = {0}", jobId));
+                Trace.WriteLine(String.Format("Consumed realm {0} ({1}) with {2} guilds", request.Realm.Name, request.Realm.Region.ToString(), request.Guilds.Count()));
 
                 foreach (var guild in request.Guilds)
                 {
                     try
                     {
                         var characters = await this._guildService.GetGuildDetailedCharactersAsync(guild.Name, guild.RealmName, guild.Region);
+                        Trace.WriteLine(String.Format("Fetched {0} / {1} characters from guild {2} on realm {3} ({4})", characters.Count(), guild.MemberCount, guild.Name, guild.RealmName, guild.Region.ToString()));
+
                         // TODO: do something with the characters.
+                        //foreach (var character in characters)
+                        //{
+                        //    Trace.WriteLine(String.Format("{0} - {1} - {2}",
+                        //        character.Name, character.Class, character.RealmName));
+                        //}
                     }
-                    catch (Exception)
+                    catch (HttpRequestException ex)
                     {
                         // Should happen for inexistent guilds.
+                        Trace.WriteLine(String.Format("Failed to retrieve guild characters for guild {0} on realm {1} ({2})",
+                            guild.Name, guild.RealmName, guild.Region.ToString()));
+                        Trace.WriteLine(ex.Message);
                     }
                 }
-            });
+            }, TimeSpan.FromDays(7));
         }
 
         public override void OnStop()

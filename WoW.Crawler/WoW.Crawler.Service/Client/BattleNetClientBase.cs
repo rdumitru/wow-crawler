@@ -52,7 +52,8 @@ namespace WoW.Crawler.Service.Client
 
             // TODO: perhaps make this a parameter?
             // Get values from the config.
-            this._apiKeys = CloudConfigurationManager.GetSetting("BattleNetApi.Keys").Split('|');
+            this._apiKeys = CloudConfigurationManager.GetSetting("BattleNetApi.Keys")
+                .Split('|').Where(key => !String.IsNullOrWhiteSpace(key));
 
             // Create the HTTP client with the given base URL.
             this._clientEU = new HttpClient { BaseAddress = new Uri(BattleNetApiBaseUrlEU) };
@@ -93,8 +94,10 @@ namespace WoW.Crawler.Service.Client
                 nvc.Add(key, keyValuePairs[key]);
             }
 
-            // Everything is already URL encoded.
-            var fullQueryStr = baseQueryStr + (nvc.Count > 0 ? '&' + nvc.ToString() : String.Empty);
+            // Base QS is already URL encoded. NVC to String will produce URL encoded output.
+            var fullQueryStr = baseQueryStr
+                + (nvc.Count > 0 ? '&' + nvc.ToString() : String.Empty);
+
             return fullQueryStr;
         }
 
@@ -106,7 +109,7 @@ namespace WoW.Crawler.Service.Client
                 // Build URL.
                 var url = relativeUrl + this.BuildQueryStr(apiKey, queryStrNvc);
 
-                // Make call.
+                // Make GET call.
                 var response = await this.GetClient(region).GetAsync(url);
                 if (response.IsSuccessStatusCode) return response;
                 lastResponse = response;

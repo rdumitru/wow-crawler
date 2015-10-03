@@ -40,12 +40,12 @@ namespace WoW.Crawler.Console
             //var guildClient = container.Resolve<IGuildClient>();
             //var guild = await guildClient.GetMemberList("ii kagen ni shiro", "Korgath", Region.US);
 
-            //var guildService = container.Resolve<IGuildService>();
-            //var guilds = await guildService.GetGuildsForRealm("Medivh", Region.EU);
-
             var guildService = container.Resolve<IGuildService>();
-            var guildMembers = await guildService.GetGuildDetailedCharactersAsync("Reroll Horde", "Medivh", Region.EU);
-            var guildMembers2 = await guildService.GetGuildMemberListAsync("Reroll Horde", "Medivh", Region.EU);
+            var guilds = await guildService.GetGuildsForRealmAsync("Medivh", Region.EU);
+
+            //var guildService = container.Resolve<IGuildService>();
+            //var guildMembers = await guildService.GetGuildDetailedCharactersAsync("Reroll Horde", "Medivh", Region.EU);
+            //var guildMembers2 = await guildService.GetGuildMemberListAsync("Reroll Horde", "Medivh", Region.EU);
 
             //var auctionClient = container.Resolve<IAuctionClient>();
             //var auctions = await auctionClient.GetAuctionListAsync("Medivh", Region.EU);

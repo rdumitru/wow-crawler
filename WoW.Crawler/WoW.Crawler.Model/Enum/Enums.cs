@@ -30,6 +30,9 @@ namespace WoW.Crawler.Model.Enum
 
         [Description("neutral")]
         Neutral = 2,
+
+        [Description("unknown")]
+        Unknown = 3,
     }
 
     public enum Gender

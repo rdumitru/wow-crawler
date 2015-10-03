@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -47,20 +48,28 @@ namespace WoW.Crawler.Service.Service
             };
 
             // Create a task for each character request.
-            // TODO: remove the Take.
             var characterTasks = auctionList.Auctions.Select(auction => this._characterClient.GetCharacterAsync(auction.Owner, auction.OwnerRealmName, auction.Region, true, false))
-                .Take(50);
+                // TODO: remove Take.
+                .Take(1000);
             var wrappedCharacterTasks = characterTasks.Select(task => taskWrapper(task));
 
-            var unfilteredGuilds = (await Task.WhenAll(wrappedCharacterTasks))
-                .Where(character => character != null && character.Guild != null)
-                .Select(character => character.Guild)
-                .ToList();
+            try
+            {
+                var unfilteredGuilds = (await Task.WhenAll(wrappedCharacterTasks))
+                    .Where(character => character != null && character.Guild != null)
+                    .Select(character => character.Guild)
+                    .ToList();
 
-            // Remove duplicate guilds.
-            var guilds = new HashSet<GuildSimpleDto>(unfilteredGuilds);
+                // Remove duplicate guilds.
+                var guilds = new HashSet<GuildSimpleDto>(unfilteredGuilds);
 
-            return guilds;
+                return guilds;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message);
+                throw ex;
+            }
         }
 
         public Task<GuildMemberListDto> GetGuildMemberListAsync(string guild, string realm, Region region)
@@ -84,11 +93,19 @@ namespace WoW.Crawler.Service.Service
             var characterTasks = memberList.Members.Select(member => this._characterClient.GetCharacterAsync(member.Character.Name, member.Character.RealmName, member.Character.Region, true, true));
             var wrappedCharacterTasks = characterTasks.Select(task => taskWrapper(task));
 
-            var characters = (await Task.WhenAll(wrappedCharacterTasks))
+            try
+            {
+                var characters = (await Task.WhenAll(wrappedCharacterTasks))
                 .Where(character => character != null)
                 .ToList();
 
-            return characters;
+                return characters;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message);
+                throw ex;
+            }
         }
 
         #endregion Public Members

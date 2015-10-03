@@ -44,13 +44,20 @@ namespace WoW.Crawler.Web.Controllers
         [HttpPost, Route("")]
         public async Task<HttpResponseMessage> Trigger()
         {
+            // Get all the realms on EU and US.
             var allRealms = (await this._realmService.GetAllRealmsAsync()).Realms;
-            foreach (var realm in allRealms)
+
+            // Create tasks for sending messages to the next worker.
+            var sendMessageTasks = allRealms.Select(realm =>
             {
                 var id = Guid.NewGuid();
                 var body = JsonConvert.SerializeObject(realm, Formatting.None);
-                await this._queueClient.SendMessageAsync(id, body);
-            }
+
+                return this._queueClient.SendMessageAsync(id, body);
+            });
+
+            // Await all tasks.
+            await Task.WhenAll(sendMessageTasks);
 
             return this.Request.CreateResponse(HttpStatusCode.Accepted);
         }
