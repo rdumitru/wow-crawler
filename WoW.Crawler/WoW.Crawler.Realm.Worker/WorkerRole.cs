@@ -55,7 +55,7 @@ namespace WoW.Crawler.Realm.Worker
                     var body = JsonConvert.SerializeObject(realmGuilds, Formatting.None);
                     await this._guildsQueueClient.SendMessageAsync(id, body);
                 }
-                catch (HttpRequestException ex)
+                catch (Exception ex)
                 {
                     Trace.WriteLine(String.Format("Failed to retrieve guilds realm {0} ({1})",
                             request.Name, request.Region.ToString()));

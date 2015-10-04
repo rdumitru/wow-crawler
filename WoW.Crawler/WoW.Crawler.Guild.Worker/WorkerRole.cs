@@ -52,7 +52,7 @@ namespace WoW.Crawler.Guild.Worker
                         //        character.Name, character.Class, character.RealmName));
                         //}
                     }
-                    catch (HttpRequestException ex)
+                    catch (Exception ex)
                     {
                         // Should happen for inexistent guilds.
                         Trace.WriteLine(String.Format("Failed to retrieve guild characters for guild {0} on realm {1} ({2})",
