@@ -57,10 +57,12 @@ namespace WoW.Crawler.Guild.Worker
                         // Should happen for inexistent guilds.
                         Trace.WriteLine(String.Format("Failed to retrieve guild characters for guild {0} on realm {1} ({2})",
                             guild.Name, guild.RealmName, guild.Region.ToString()));
-                        Trace.WriteLine(ex.Message);
+
+                        var error = new[] { "Unhandled Exception: ", ex.Message, ex.StackTrace };
+                        Trace.WriteLine(String.Join(Environment.NewLine, error));
                     }
                 }
-            }, TimeSpan.FromDays(7));
+            });
         }
 
         public override void OnStop()

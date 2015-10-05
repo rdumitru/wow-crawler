@@ -57,11 +57,13 @@ namespace WoW.Crawler.Realm.Worker
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine(String.Format("Failed to retrieve guilds realm {0} ({1})",
+                    Trace.WriteLine(String.Format("Failed to retrieve guilds on realm {0} ({1})",
                             request.Name, request.Region.ToString()));
-                    Trace.WriteLine(ex.Message);
+
+                    var error = new[] { "Unhandled Exception: ", ex.Message, ex.StackTrace };
+                    Trace.WriteLine(String.Join(Environment.NewLine, error));
                 }
-            }, TimeSpan.FromDays(7));
+            });
         }
 
         public override void OnStop()

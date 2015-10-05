@@ -10,6 +10,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Timer = System.Timers.Timer;
 
 namespace WoW.Crawler.Service.Messaging
 {
@@ -17,11 +18,9 @@ namespace WoW.Crawler.Service.Messaging
     {
         Task SendMessageAsync(Guid messageId, string body);
 
-        void ReceiveMessage(Action<Guid, T> action, TimeSpan autoRenewTimeout,
-            int maxConcurrentCalls = 1, bool autoComplete = true);
+        void ReceiveMessage(Action<Guid, T> action, int maxConcurrentCalls = 1);
 
-        void ReceiveMessageAsync(Func<Guid, T, Task> func, TimeSpan autoRenewTimeout,
-            int maxConcurrentCalls = 1, bool autoComplete = true);
+        void ReceiveMessageAsync(Func<Guid, T, Task> func, int maxConcurrentCalls = 1);
 
         void CloseConnection();
     }
@@ -31,6 +30,12 @@ namespace WoW.Crawler.Service.Messaging
         private readonly string _queueName;
         private readonly QueueClient _client;
         private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
+
+        // Keep-alive heartbeat interval.
+        private static readonly double FifteenSeconds = TimeSpan.FromSeconds(15).TotalMilliseconds;
+
+        // WARN: must be greater than the heartbeat interval.
+        private static readonly TimeSpan AutoRenewTimeout = TimeSpan.FromMinutes(5);
 
         public QueueClientWrapper(string queueName)
         {
@@ -54,62 +59,90 @@ namespace WoW.Crawler.Service.Messaging
             await this._client.SendAsync(new BrokeredMessage(body) { MessageId = messageId.ToString() });
         }
 
-        public void ReceiveMessage(Action<Guid, T> action, TimeSpan autoRenewTimeout,
-            int maxConcurrentCalls = 1, bool autoComplete = true)
+        public void ReceiveMessage(Action<Guid, T> action, int maxConcurrentCalls = 1)
         {
-            try
+            this._client.OnMessage(msg =>
             {
-                // Initiates the message pump and callback is invoked for each message that is received, calling close on the client will stop the pump.
-                this._client.OnMessage(msg =>
-                {
-                    var jobId = Guid.Parse(msg.MessageId);
-                    var messageBody = msg.GetBody<string>();
-                    var request = JsonConvert.DeserializeObject<T>(messageBody);
+                var jobId = Guid.Parse(msg.MessageId);
+                var messageBody = msg.GetBody<string>();
+                var request = JsonConvert.DeserializeObject<T>(messageBody);
 
-                    action(jobId, request);
-                },
-                new OnMessageOptions
+                using (var timer = new Timer(FifteenSeconds))
                 {
-                    AutoComplete = autoComplete,
-                    AutoRenewTimeout = autoRenewTimeout,
-                    MaxConcurrentCalls = maxConcurrentCalls
-                });
+                    try
+                    {
+                        // Renew lock periodically to keep message alive.
+                        timer.Elapsed += (sender, args) =>
+                        {
+                            msg.RenewLock();
+                        };
 
-                this._completedEvent.WaitOne();
-            }
-            catch (Exception ex)
+                        timer.Start();
+                        action(jobId, request);
+                        timer.Stop();
+                    }
+                    catch (Exception ex)
+                    {
+                        var error = new[] { "Unhandled Exception: ", ex.Message, ex.StackTrace };
+                        Trace.WriteLine(String.Join(Environment.NewLine, error));
+                    }
+                    finally
+                    {
+                        timer.Stop();
+                        msg.Complete();
+                    }
+                }
+            },
+            new OnMessageOptions
             {
-                Trace.WriteLine(ex.Message);
-            }
+                MaxConcurrentCalls = maxConcurrentCalls,
+                AutoRenewTimeout = AutoRenewTimeout
+            });
+
+            this._completedEvent.WaitOne();
         }
 
-        public void ReceiveMessageAsync(Func<Guid, T, Task> func, TimeSpan autoRenewTimeout,
-            int maxConcurrentCalls = 1, bool autoComplete = true)
+        public void ReceiveMessageAsync(Func<Guid, T, Task> func, int maxConcurrentCalls = 1)
         {
-            try
+            this._client.OnMessageAsync(async msg =>
             {
-                // Initiates the message pump and callback is invoked for each message that is received, calling close on the client will stop the pump.
-                this._client.OnMessageAsync(async msg =>
-                {
-                    var jobId = Guid.Parse(msg.MessageId);
-                    var messageBody = msg.GetBody<string>();
-                    var request = JsonConvert.DeserializeObject<T>(messageBody);
+                var jobId = Guid.Parse(msg.MessageId);
+                var messageBody = msg.GetBody<string>();
+                var request = JsonConvert.DeserializeObject<T>(messageBody);
 
-                    await func(jobId, request);
-                },
-                new OnMessageOptions
+                using (var timer = new Timer(FifteenSeconds))
                 {
-                    AutoComplete = autoComplete,
-                    AutoRenewTimeout = autoRenewTimeout,
-                    MaxConcurrentCalls = maxConcurrentCalls
-                });
+                    try
+                    {
+                        // Renew lock periodically to keep message alive.
+                        timer.Elapsed += (sender, args) =>
+                        {
+                            msg.RenewLock();
+                        };
 
-                this._completedEvent.WaitOne();
-            }
-            catch (Exception ex)
+                        timer.Start();
+                        await func(jobId, request);
+                        timer.Stop();
+                    }
+                    catch (Exception ex)
+                    {
+                        var error = new[] { "Unhandled Exception: ", ex.Message, ex.StackTrace };
+                        Trace.WriteLine(String.Join(Environment.NewLine, error));
+                    }
+                    finally
+                    {
+                        timer.Stop();
+                        msg.Complete();
+                    }
+                }
+            },
+            new OnMessageOptions
             {
-                Trace.WriteLine(ex.Message);
-            }
+                MaxConcurrentCalls = maxConcurrentCalls,
+                AutoRenewTimeout = AutoRenewTimeout
+            });
+
+            this._completedEvent.WaitOne();
         }
 
         public void CloseConnection()
