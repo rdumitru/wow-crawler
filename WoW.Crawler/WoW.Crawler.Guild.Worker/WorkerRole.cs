@@ -34,7 +34,7 @@ namespace WoW.Crawler.Guild.Worker
         public override void Run()
         {
             Trace.WriteLine("WoW.Crawler.Guild.Worker is running");
-            this._guildsQueueClient.ReceiveMessageAsync(async (jobId, request) =>
+            this._guildsQueueClient.RegisterOnMessageAsyncFunc(async (jobId, request) =>
             {
                 Trace.WriteLine(String.Format("Consumed realm {0} ({1}) with {2} guilds", request.Realm.Name, request.Realm.Region.ToString(), request.Guilds.Count()));
 

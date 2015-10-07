@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WoW.Crawler.Model.DTO;
 using WoW.Crawler.Model.Enum;
@@ -40,16 +41,27 @@ namespace WoW.Crawler.Service.Service
             // Get the list of all auctions on the server.
             var auctionList = await this._auctionClient.GetAuctionListAsync(realm, region);
 
-            // Return null for tasks which throw an exception.
+            // Return null for tasks which throw an exception and throttle.
+            // TODO: choose semaphore limit.
+            SemaphoreSlim throttler = new SemaphoreSlim(64);
             Func<Task<CharacterDto>, Task<CharacterDto>> taskWrapper = async (task) =>
             {
-                try { return await task; }
+                try
+                {
+                    var result = await task;
+                    return result;
+                }
                 catch (HttpRequestException) { return null; }
+                finally { throttler.Release(); }
             };
 
             // Create a task for each character request.
             var characterTasks = auctionList.Auctions.Select(auction => this._characterClient.GetCharacterAsync(auction.Owner, auction.OwnerRealmName, auction.Region, true, false));
-            var wrappedCharacterTasks = characterTasks.Select(task => taskWrapper(task));
+            var wrappedCharacterTasks = characterTasks.Select(task =>
+            {
+                throttler.Wait();
+                return taskWrapper(task);
+            });
 
             var unfilteredGuilds = (await Task.WhenAll(wrappedCharacterTasks))
                 .Where(character => character != null && character.Guild != null)

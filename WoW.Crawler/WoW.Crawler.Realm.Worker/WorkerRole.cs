@@ -39,7 +39,7 @@ namespace WoW.Crawler.Realm.Worker
         public override void Run()
         {
             Trace.WriteLine("WoW.Crawler.Realm.Worker is running");
-            this._realmQueueClient.ReceiveMessageAsync(async (jobId, request) =>
+            this._realmQueueClient.RegisterOnMessageAsyncFunc(async (jobId, request) =>
             {
                 Trace.WriteLine(String.Format("Consumed realm {0} ({1})", request.Name, request.Region.ToString()));
 

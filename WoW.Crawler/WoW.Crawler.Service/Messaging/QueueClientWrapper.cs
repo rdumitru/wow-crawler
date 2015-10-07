@@ -18,9 +18,9 @@ namespace WoW.Crawler.Service.Messaging
     {
         Task SendMessageAsync(Guid messageId, string body);
 
-        void ReceiveMessage(Action<Guid, T> action, int maxConcurrentCalls = 1);
+        void RegisterOnMessageAction(Action<Guid, T> action, int maxConcurrentCalls = 1);
 
-        void ReceiveMessageAsync(Func<Guid, T, Task> func, int maxConcurrentCalls = 1);
+        void RegisterOnMessageAsyncFunc(Func<Guid, T, Task> func, int maxConcurrentCalls = 1);
 
         void CloseConnection();
     }
@@ -31,10 +31,10 @@ namespace WoW.Crawler.Service.Messaging
         private readonly QueueClient _client;
         private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
 
-        // Keep-alive heartbeat interval.
+        // Renew lock heartbeat interval.
         private static readonly double FifteenSeconds = TimeSpan.FromSeconds(15).TotalMilliseconds;
 
-        // WARN: must be greater than the heartbeat interval.
+        // WARN: must be greater than the renew lock heartbeat interval.
         private static readonly TimeSpan AutoRenewTimeout = TimeSpan.FromMinutes(5);
 
         public QueueClientWrapper(string queueName)
@@ -59,7 +59,7 @@ namespace WoW.Crawler.Service.Messaging
             await this._client.SendAsync(new BrokeredMessage(body) { MessageId = messageId.ToString() });
         }
 
-        public void ReceiveMessage(Action<Guid, T> action, int maxConcurrentCalls = 1)
+        public void RegisterOnMessageAction(Action<Guid, T> action, int maxConcurrentCalls = 1)
         {
             this._client.OnMessage(msg =>
             {
@@ -71,7 +71,7 @@ namespace WoW.Crawler.Service.Messaging
                 {
                     try
                     {
-                        // Renew lock periodically to keep message alive.
+                        // Renew lock heartbeat to periodically to keep message alive.
                         timer.Elapsed += (sender, args) =>
                         {
                             msg.RenewLock();
@@ -95,14 +95,15 @@ namespace WoW.Crawler.Service.Messaging
             },
             new OnMessageOptions
             {
-                MaxConcurrentCalls = maxConcurrentCalls,
-                AutoRenewTimeout = AutoRenewTimeout
+                AutoComplete = true,
+                AutoRenewTimeout = AutoRenewTimeout,
+                MaxConcurrentCalls = maxConcurrentCalls
             });
 
             this._completedEvent.WaitOne();
         }
 
-        public void ReceiveMessageAsync(Func<Guid, T, Task> func, int maxConcurrentCalls = 1)
+        public void RegisterOnMessageAsyncFunc(Func<Guid, T, Task> func, int maxConcurrentCalls = 1)
         {
             this._client.OnMessageAsync(async msg =>
             {
@@ -138,8 +139,9 @@ namespace WoW.Crawler.Service.Messaging
             },
             new OnMessageOptions
             {
-                MaxConcurrentCalls = maxConcurrentCalls,
-                AutoRenewTimeout = AutoRenewTimeout
+                AutoComplete = true,
+                AutoRenewTimeout = AutoRenewTimeout,
+                MaxConcurrentCalls = maxConcurrentCalls
             });
 
             this._completedEvent.WaitOne();
