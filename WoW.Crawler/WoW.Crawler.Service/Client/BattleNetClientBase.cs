@@ -53,7 +53,7 @@ namespace WoW.Crawler.Service.Client
             // TODO: perhaps make this a parameter?
             // Get values from the config.
             this._apiKeys = CloudConfigurationManager.GetSetting("BattleNetApi.Keys")
-                .Split('|').Where(key => !String.IsNullOrWhiteSpace(key));
+                .Split('|').Where(key => !String.IsNullOrWhiteSpace(key)).ToList();
 
             // Create the HTTP client with the given base URL.
             this._clientEU = new HttpClient { BaseAddress = new Uri(BattleNetApiBaseUrlEU) };

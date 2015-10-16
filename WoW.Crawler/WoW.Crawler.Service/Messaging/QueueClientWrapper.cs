@@ -63,19 +63,17 @@ namespace WoW.Crawler.Service.Messaging
         {
             this._client.OnMessage(msg =>
             {
-                var jobId = Guid.Parse(msg.MessageId);
-                var messageBody = msg.GetBody<string>();
-                var request = JsonConvert.DeserializeObject<T>(messageBody);
-
                 using (var timer = new Timer(FifteenSeconds))
                 {
                     try
                     {
+                        // Deserialize the message.
+                        var jobId = Guid.Parse(msg.MessageId);
+                        var messageBody = msg.GetBody<string>();
+                        var request = JsonConvert.DeserializeObject<T>(messageBody);
+
                         // Renew lock heartbeat to periodically to keep message alive.
-                        timer.Elapsed += (sender, args) =>
-                        {
-                            msg.RenewLock();
-                        };
+                        timer.Elapsed += (sender, args) => { msg.RenewLock(); };
 
                         timer.Start();
                         action(jobId, request);
@@ -107,19 +105,17 @@ namespace WoW.Crawler.Service.Messaging
         {
             this._client.OnMessageAsync(async msg =>
             {
-                var jobId = Guid.Parse(msg.MessageId);
-                var messageBody = msg.GetBody<string>();
-                var request = JsonConvert.DeserializeObject<T>(messageBody);
-
                 using (var timer = new Timer(FifteenSeconds))
                 {
                     try
                     {
+                        // Deserialize the message.
+                        var jobId = Guid.Parse(msg.MessageId);
+                        var messageBody = msg.GetBody<string>();
+                        var request = JsonConvert.DeserializeObject<T>(messageBody);
+
                         // Renew lock periodically to keep message alive.
-                        timer.Elapsed += (sender, args) =>
-                        {
-                            msg.RenewLock();
-                        };
+                        timer.Elapsed += (sender, args) => { msg.RenewLock(); };
 
                         timer.Start();
                         await func(jobId, request);
